@@ -5,13 +5,17 @@
 
 ### New features
 
-- Herontwerp Contactverzoek invoeren #705
-- Verplaatsen van OnderwerpLinks #805
+- Digitale adressen opslaan conform validatieregels OK2 #939
+- Tonen van digitale adressen aanpassen naar gebruik enums #974
+- Soorten digitaal adres aanpassen naar gebruik enums #891
 - Klantcontacten bij een Zaak tonen #809
 - Anonieme Contactverzoeken zoeken #810
-- Genereren KISS mockup content [interne data] #977
 - Versienummer zichtbaar in de website #978
+- Genereren KISS mockup content [interne data] #977
+- Verplaatsen van OnderwerpLinks #805
+- Herontwerp Contactverzoek invoeren #705
 
+  
 ### Bugfixes
 
 - Afdwingen max token lifetime van /api/contactmomentendetails #915

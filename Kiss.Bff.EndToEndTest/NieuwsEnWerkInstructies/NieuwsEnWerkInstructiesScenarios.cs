@@ -899,11 +899,18 @@ public class NieuwsEnWerkInstructiesScenarios : KissPlaywrightTest
     {
         await Step("Given a nieuwsbericht for a publicatiedatum in the past");
 
-        await Step("When the user navigates to the HOME PageAnd the user browses through all pages of the Nieuws section");
+        await using var nieuws = await Page.CreateBericht(new() { Title = Guid.NewGuid().ToString(), BerichtType = BerichtType.Nieuws, PublishDateOffset = TimeSpan.FromDays(-1) });
+
+        await Step("When the user navigates to the HOME Page And the user browses through all pages of the Nieuws section");
+
+        await Page.GotoAsync("/");
+        var articles = Page.GetNieuwsSection().GetByRole(AriaRole.Article);
 
         await Step("Then the nieuwsbericht should be visible");
 
-        Assert.Inconclusive("Not implemented yet");
+        await Expect(articles.GetByRole(AriaRole.Heading, new() { Name = nieuws.Title })).ToBeVisibleAsync();
+
+
     }
 
     [TestMethod]
@@ -911,13 +918,22 @@ public class NieuwsEnWerkInstructiesScenarios : KissPlaywrightTest
     {
         await Step("Given a nieuwsbericht for a publicatie-einddatum in the past");
 
+        await using var nieuws = await Page.CreateBericht(new() { Title = Guid.NewGuid().ToString(), BerichtType = BerichtType.Nieuws, PublicatieEinddatum = DateTime.Now.AddDays(-1) });
+
         await Step("When the user navigates to the HOME Page");
+
+        await Page.GotoAsync("/");
+
 
         await Step("And browses through all pages of the Nieuws section");
 
+        var articles = Page.GetNieuwsSection().GetByRole(AriaRole.Article);
+
+
         await Step("Then the nieuwsbericht should not be visible");
 
-        Assert.Inconclusive("Not implemented yet");
+        await Expect(articles.GetByRole(AriaRole.Heading, new() { Name = nieuws.Title })).ToBeHiddenAsync();
+
     }
 
     [TestMethod]
@@ -925,13 +941,21 @@ public class NieuwsEnWerkInstructiesScenarios : KissPlaywrightTest
     {
         await Step("Given a nieuwsbericht for a publicatie-einddatum in the future");
 
+        await using var nieuws = await Page.CreateBericht(new() { Title = Guid.NewGuid().ToString(), BerichtType = BerichtType.Nieuws, PublicatieEinddatum = DateTime.Now.AddDays(1) });
+
         await Step("When the user navigates to the HOME Page");
+
+        await Page.GotoAsync("/");
 
         await Step("And browses through all pages of the Nieuws section");
 
+        var articles = Page.GetNieuwsSection().GetByRole(AriaRole.Article);
+
         await Step("Then the nieuwsbericht should be visible");
 
-        Assert.Inconclusive("Not implemented yet");
+        await Expect(articles.GetByRole(AriaRole.Heading, new() { Name = nieuws.Title })).ToBeHiddenAsync();
+
+
     }
 
     [TestMethod]
@@ -939,13 +963,28 @@ public class NieuwsEnWerkInstructiesScenarios : KissPlaywrightTest
     {
         await Step("Given a nieuwsbericht with multiple skills");
 
+        await using var skill1 = await Page.CreateSkill(Guid.NewGuid().ToString());
+        await using var skill2 = await Page.CreateSkill(Guid.NewGuid().ToString());
+        await using var skill3 = await Page.CreateSkill(Guid.NewGuid().ToString());
+
+        await using var bericht = await Page.CreateBericht(new() { Title = Guid.NewGuid().ToString(), BerichtType = BerichtType.Nieuws, Skill = $"{skill1.Naam},{skill2.Naam},{skill3.Naam}" });
+
         await Step("When the user navigates to the HOME Page");
+
+        await Page.GotoAsync("/");
 
         await Step("And browses through all pages of the Nieuws section");
 
+        var articles = Page.GetNieuwsSection().GetByRole(AriaRole.Article).Filter(new()
+        {
+            Has = Page.GetByRole(AriaRole.Heading, new() { Name = bericht.Title }).First
+        });
+       
         await Step("Then the nieuwsbericht should be displayed with the corresponding skills as labels");
+       
+        await Expect(articles).ToBeVisibleAsync();
+        await Expect(articles.Locator(".skills-container").Locator("small")).ToHaveCountAsync(3);
 
-        Assert.Inconclusive("Not implemented yet");
     }
 
     [TestMethod]
@@ -953,12 +992,22 @@ public class NieuwsEnWerkInstructiesScenarios : KissPlaywrightTest
     {
         await Step("Given a werkinstructie with multiple skills");
 
+        await using var skill1 = await Page.CreateSkill(Guid.NewGuid().ToString());
+        await using var skill2 = await Page.CreateSkill(Guid.NewGuid().ToString());
+
+        await using var bericht = await Page.CreateBericht(new() { Title = Guid.NewGuid().ToString(), BerichtType = BerichtType.Werkinstructie, Skill = $"{skill1.Naam},{skill2.Naam}" });
+
         await Step("When the user navigates to the HOME Page");
+
+        await Page.GotoAsync("/");
 
         await Step("And browses through all pages of the Nieuws section");
 
+        var articles = Page.GetNieuwsSection().GetByRole(AriaRole.Article);
+         
         await Step("Then the werkinstructie should be displayed with the corresponding skills as labels");
 
-        Assert.Inconclusive("Not implemented yet");
+        await Expect(articles.GetByRole(AriaRole.Heading, new() { Name = bericht.Title })).ToBeVisibleAsync();
+        
     }
 }

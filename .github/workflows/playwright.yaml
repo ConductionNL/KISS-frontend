@@ -7,6 +7,15 @@ on:
     paths: ['Kiss.Bff.EndToEndTest/**']
   workflow_dispatch:
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
 jobs:
   test:
     timeout-minutes: 60
@@ -31,27 +40,20 @@ jobs:
         'TestSettings:TEST_PASSWORD': '${{ secrets.PLAYWRIGHT_PASSWORD }}'
         'TestSettings:TEST_TOTP_SECRET': ${{ secrets.PLAYWRIGHT_TOTP_SECRET }}
         'TestSettings:TEST_BASE_URL': ${{ secrets.PLAYWRIGHT_BASE_URL }}
-    - name: Create html file
-      if: ${{ failure() && steps.e2e.conclusion == 'failure' }}
-      run: |
-        cd bin/Debug/net8.0/playwright-traces
-        my_string=$(echo *.zip)
-        IFS=' ' read -ra my_array <<< "$my_string"
-        result='<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Playwright traces</title></head><body><ul>'
-
-        #Print the split string
-        for i in "${my_array[@]}"
-        do
-            result+="<li><a target=\"_blank\" href=\"https://trace.playwright.dev/?trace=https://klantinteractie-servicesysteem.github.io/KISS-frontend/$i\">$i</a></li>"
-        done
-
-        result+="</ul></body></html>"
-        echo "$result"
-        echo "$result" > index.html
-    - name: Deploy to GitHub Pages
-      if: ${{ failure() && steps.e2e.conclusion == 'failure' }}
-      uses: peaceiris/actions-gh-pages@v4
+    - name: Upload artifact
+      if: ${{ always() }}
+      uses: actions/upload-pages-artifact@v3
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./Kiss.Bff.EndToEndTest/bin/Debug/net8.0/playwright-traces # directory of your reports
-        publish_branch: gh-pages/e2e # deploying to gh-pages branch
+        # directory of your reports
+        path: './Kiss.Bff.EndToEndTest/bin/Debug/net8.0/playwright-traces'
+  deploy:
+    if: ${{ always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
+    needs: test
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

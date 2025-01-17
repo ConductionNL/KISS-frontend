@@ -831,19 +831,19 @@ public class NieuwsEnWerkInstructiesScenarios : KissPlaywrightTest
     {
         await Step("Given the user is on the Nieuws and werkinstructiesscreen available under Beheer");
 
-        await Step("When the user clicks on the “Toevoegen” button");
-
-        await Step("And selects Werkinstructieas ‘Type’");
-
-        await Step("And fills in the ‘Titel’ and ‘Inhoud’ fields");
-
-        await Step("And clicks on the submit button");
+        await using var werkbericht = await Page.CreateBericht(new() { Title = Guid.NewGuid().ToString(), BerichtType = BerichtType.Werkinstructie });
 
         await Step("And navigates to the page containing the werkinstructie created earlier ");
 
+        await Page.GetBeheerRowByValue(werkbericht.Title).GetByRole(AriaRole.Link).ClickAsync();
+ 
         await Step("Then the werkinstructie should be displayed");
 
-        Assert.Inconclusive("Not implemented yet");
+        await Expect(Page.GetByRole(AriaRole.Textbox, new() { Name = "Titel" })).ToHaveValueAsync(werkbericht.Title);
+        await Expect(Page.GetByText(BerichtType.Werkinstructie.ToString(), new() { Exact = true })).ToBeCheckedAsync();
+
+
+
     }
 
     [TestMethod]
@@ -851,11 +851,18 @@ public class NieuwsEnWerkInstructiesScenarios : KissPlaywrightTest
     {
         await Step("Given there is at least 1 nieuwsbericht");
 
+        await using var nieuws = await Page.CreateBericht(new() { Title = Guid.NewGuid().ToString(), BerichtType = BerichtType.Nieuws });
+
         await Step("When the user navigates to the Nieuws and werkinstructiesscreen available under Beheer");
+
+        await Page.NavigateToNieuwsWerkinstructiesBeheer();
 
         await Step("Then there is a table titled ‘Berichten’ with rows named as “Titel”, “Type”,”publicatiedatum”, “Aangemaakt op” and “ Gewijzigd op”");
 
-        Assert.Inconclusive("Not implemented yet");
+        await Expect(Page.GetBeheerTableCell(1,1)).ToHaveTextAsync(nieuws.Title);
+        await Expect(Page.GetBeheerTableCell(2, 1)).ToHaveTextAsync(nieuws.BerichtType.ToString());
+        await Expect(Page.GetBeheerTableCell(3, 1)).ToHaveTextAsync(DateTime.Now.ToString("dd-MM-yyyy, HH:mm"));
+
     }
 
     [TestMethod]
@@ -869,13 +876,21 @@ public class NieuwsEnWerkInstructiesScenarios : KissPlaywrightTest
     {
         await Step("Given a nieuwsbericht for with a publicatiedatum in the future");
 
+        await using var niewus = await Page.CreateBericht(new() { Title = Guid.NewGuid().ToString(), BerichtType = BerichtType.Nieuws, PublishDateOffset = TimeSpan.FromDays(1) });
+
         await Step("When the user navigates to the HOME Page");
+
+        await Page.GotoAsync("/");
 
         await Step("And browses through all pages of the Nieuws section");
 
+        var articles = Page.GetNieuwsSection().GetByRole(AriaRole.Article);
+          
         await Step("Then the nieuwsbericht should not be visible");
 
-        Assert.Inconclusive("Not implemented yet");
+        await Expect(articles.GetByRole(AriaRole.Heading, new() { Name = niewus.Title })).ToBeHiddenAsync();
+
+      
     }
 
     [TestMethod]

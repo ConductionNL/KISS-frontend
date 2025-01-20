@@ -52,5 +52,13 @@ export default defineConfig(({ mode }) => {
         all: true,
       },
     },
+    css: {
+      preprocessorOptions: {
+        scss: {
+          // resolves deprecation warnings from dart-sass
+          api: "modern",
+        },
+      },
+    },
   };
 });

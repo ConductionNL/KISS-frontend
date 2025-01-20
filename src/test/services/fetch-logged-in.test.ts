@@ -12,7 +12,7 @@ import {
 } from "vitest";
 
 import { setupServer } from "msw/node";
-import { rest } from "msw";
+import { http } from "msw";
 
 const someUrl = "https://dummy.request.fgdsf";
 
@@ -27,9 +27,12 @@ describe("fetchLoggedIn", () => {
   let status = 401;
 
   const server = setupServer(
-    rest.get(someUrl, (req, res, ctx) => {
-      return res(ctx.status(status), ctx.json("test"));
-    })
+    http.get(someUrl, () => {
+      return new Response("test", {
+        headers: { "Content-Type": "application/json" },
+        status,
+      });
+    }),
   );
 
   // Start server before tests
@@ -57,7 +60,7 @@ describe("fetchLoggedIn", () => {
     await flushPromises();
 
     expect(consoleWarnMock).toHaveBeenLastCalledWith(
-      "session expired. waiting for user to log in..."
+      "session expired. waiting for user to log in...",
     );
 
     status = 200;
@@ -67,7 +70,7 @@ describe("fetchLoggedIn", () => {
     await promise;
 
     expect(consoleLogMock).toHaveBeenLastCalledWith(
-      "user is logged in again, resuming..."
+      "user is logged in again, resuming...",
     );
   });
 });

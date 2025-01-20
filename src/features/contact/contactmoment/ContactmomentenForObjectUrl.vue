@@ -16,6 +16,8 @@ import { watchEffect } from "vue";
 import ContactmomentenOverzicht from "./ContactmomentenOverzicht.vue";
 import { fetchContactmomentenByObjectUrl } from "./service";
 
+defineSlots();
+
 const props = defineProps<{
   objectUrl: string;
   gebruikKlantInteracties: boolean;

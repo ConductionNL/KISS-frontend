@@ -51,6 +51,8 @@ import { search } from "./service";
 import type { ContactverzoekOverzichtItem } from "./types";
 import ApplicationMessage from "@/components/ApplicationMessage.vue";
 
+defineSlots();
+
 const openKlant2 = ref<boolean>(false);
 
 const store = ensureState({

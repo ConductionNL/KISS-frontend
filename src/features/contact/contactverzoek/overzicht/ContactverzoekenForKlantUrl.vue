@@ -17,6 +17,8 @@ import ContactverzoekenOverzicht from "./ContactverzoekenOverzicht.vue";
 import { fetchContactverzoekenByKlantId } from "./service";
 import type { ContactverzoekOverzichtItem } from "./types";
 
+defineSlots();
+
 const props = defineProps<{
   klantUrl: string;
   gebruikKlantInteracties: boolean;

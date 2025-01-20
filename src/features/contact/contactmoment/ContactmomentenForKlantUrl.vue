@@ -16,6 +16,8 @@ import { watchEffect } from "vue";
 import ContactmomentenOverzicht from "./ContactmomentenOverzicht.vue";
 import { fetchContactmomentenByKlantId } from "./service";
 
+defineSlots();
+
 const props = defineProps<{
   klantUrl: string;
   gebruikKlantInteracties: boolean;

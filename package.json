@@ -18,7 +18,7 @@
     "@ckeditor/ckeditor5-vue": "^6.0.0",
     "@vueuse/core": "^8.9.4",
     "ckeditor5": "^43.3.0",
-    "dompurify": "^2.5.7",
+    "dompurify": "^2.5.8",
     "nanoid": "^4.0.2",
     "pinia": "^2.2.5",
     "swrv": "^1.0.3",

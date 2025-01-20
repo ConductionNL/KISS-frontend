@@ -43,6 +43,7 @@ const config: EditorConfig = {
     defaultHeadings: { rows: 1 },
     contentToolbar: ["tableColumn", "tableRow"],
   },
+  licenseKey: "GPL",
 };
 </script>
 
